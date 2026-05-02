@@ -3,7 +3,7 @@
 <?php
 require_once __DIR__ . "/../includes/config.php";
 
-// ── Guard: require a valid product ID in the URL ──────────────────────────────
+// ── requires a valid product ID in the URL ──────────────────────────────
 $pId = intval($_GET['id'] ?? 0);
 
 if ($pId <= 0) {
@@ -82,9 +82,9 @@ $avgRating = $reviewCount > 0
                 <ul id="nav-menu"
                     class="flex flex-col p-4 md:p-0 mt-4 font-semibold md:space-x-10 md:flex-row md:mt-0 text-[14px] tracking-wide uppercase transition-colors duration-500">
                     <li><a href="../pages/shop.php" class="hover:opacity-60">Shop</a></li>
-                    <li><a href="../pages/collections.php" class="hover:opacity-60">Collections</a></li>
-                    <li><a href="../pages/about.php" class="hover:opacity-60">About</a></li>
-                    <li><a href="../pages/contact.php" class="hover:opacity-60">Contact Us</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Collections</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">About</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Contact Us</a></li>
                 </ul>
             </div>
 
@@ -98,9 +98,9 @@ $avgRating = $reviewCount > 0
                     </div>
                 </a>
 
-                <button type="button" class="hover:opacity-60 transition-opacity">
+                <a href="profile.php" class="relative hover:opacity-60 transition-opacity">
                     <i class="fa-regular fa-user"></i>
-                </button>
+                </a>
             </div>
     </nav>
 
@@ -276,7 +276,7 @@ $avgRating = $reviewCount > 0
 
     </section>
 
-    <!-- REVIEW MODAL (pure Tailwind) -->
+    <!-- REVIEW MODAL-->
     <div id="reviewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-black/50" onclick="closeReviewModal()"></div>
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 z-10">
@@ -323,20 +323,20 @@ $avgRating = $reviewCount > 0
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Information</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="#" class="hover:underline">Privacy</a></li>
-                        <li><a href="#" class="hover:underline">FAQ</a></li>
-                        <li><a href="#" class="hover:underline">Shipping and payment</a></li>
-                        <li><a href="#" class="hover:underline">Partners</a></li>
-                        <li><a href="#" class="hover:underline">Blog</a></li>
-                        <li><a href="#" class="hover:underline">Contacts</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Privacy</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">FAQ</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Shipping and payment</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Partners</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Blog</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Contacts</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Menu</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="shop.php" class="hover:underline">Shop</a></li>
-                        <li><a href="collections.php" class="hover:underline">Collections</a></li>
-                        <li><a href="new_releases.php" class="hover:underline">New Releases</a></li>
+                        <li><a href="../pages/shop.php" class="hover:underline">Shop</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Collections</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">New Releases</a></li>
                     </ul>
                 </div>
                 <div class="hidden md:block"></div>
@@ -428,7 +428,7 @@ $avgRating = $reviewCount > 0
             document.getElementById('qty').textContent = qty;
         }
 
-        // ── Review Modal ──────────────────────────────────────────────────────
+        // ── Review Modal Functions ──────────────────────────────────────────────────────
         function openReviewModal() {
             selectedRating = 0;
             document.getElementById('reviewRating').value = 0;
@@ -457,7 +457,7 @@ $avgRating = $reviewCount > 0
                 btn.classList.toggle('text-gray-200',   star > value);
             });
         }
-
+                                
         async function submitReview() {
             const errEl   = document.getElementById('reviewError');
             const rating  = parseInt(document.getElementById('reviewRating').value);
@@ -477,6 +477,7 @@ $avgRating = $reviewCount > 0
             }
 
             try {
+                // Submit the review data to the API
                 const res  = await fetch('../api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

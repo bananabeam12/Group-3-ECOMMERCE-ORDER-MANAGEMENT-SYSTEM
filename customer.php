@@ -26,9 +26,9 @@
                 <ul id="nav-menu"
                     class="flex flex-col p-4 md:p-0 mt-4 font-semibold md:space-x-10 md:flex-row md:mt-0 text-[14px] tracking-wide uppercase transition-colors duration-500">
                     <li><a href="pages/shop.php" class="hover:opacity-60">Shop</a></li>
-                    <li><a href="pages/collections.php" class="hover:opacity-60">Collections</a></li>
-                    <li><a href="pages/about.php" class="hover:opacity-60">About</a></li>
-                    <li><a href="pages/contact.php" class="hover:opacity-60">Contact Us</a></li>
+                    <li><a href="pages/404.php" class="hover:opacity-60">Collections</a></li>
+                    <li><a href="pages/404.php" class="hover:opacity-60">About</a></li>
+                    <li><a href="pages/404.php" class="hover:opacity-60">Contact Us</a></li>
                 </ul>
             </div>
 
@@ -212,11 +212,12 @@
             </div>
         </div>
     </section>
+
     <section class="bg-white py-12 px-4 md:px-10 mt-20">
         <div class="max-w-screen-xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-[350px]">
 
-                <a href="shop.php?collection=better-days" class="group relative block overflow-hidden bg-gray-100">
+                <a href="/pages/404.php" class="group relative block overflow-hidden bg-gray-100">
                     <img src="assets/images/hero_carousel_3.jpg" alt="two man in a photo"
                         class="w-full h-full object-cover">
 
@@ -234,7 +235,7 @@
                     </div>
                 </a>
 
-                <a href="shop.php?collection=josh" class="group relative block overflow-hidden bg-gray-100">
+                <a href="/pages/404.php" class="group relative block overflow-hidden bg-gray-100">
                     <img src="assets/images/collection_thumbnail_2.jpg" alt="sunglasses"
                         class="w-full h-full object-cover">
                     <div
@@ -250,8 +251,7 @@
                     </div>
                 </a>
 
-                <a href="shop.php?collection=ordinary"
-                    class="group relative block overflow-hidden bg-gray-100 md:col-span-2 h-[400px]">
+                <a href="/pages/404.php" class="group relative block overflow-hidden bg-gray-100 md:col-span-2 h-[400px]">
                     <img src="assets/images/collection_thumbnail_3.jpg" alt="Ordinary Vol 1"
                         class="w-full h-full object-cover">
                     <div
@@ -279,20 +279,20 @@
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Information</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="#" class="hover:underline">Privacy</a></li>
-                        <li><a href="#" class="hover:underline">FAQ</a></li>
-                        <li><a href="#" class="hover:underline">Shipping and payment</a></li>
-                        <li><a href="#" class="hover:underline">Partners</a></li>
-                        <li><a href="#" class="hover:underline">Blog</a></li>
-                        <li><a href="#" class="hover:underline">Contacts</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Privacy</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">FAQ</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Shipping and payment</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Partners</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Blog</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Contacts</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Menu</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="shop.php" class="hover:underline">Shop</a></li>
-                        <li><a href="collections.php" class="hover:underline">Collections</a></li>
-                        <li><a href="new_releases.php" class="hover:underline">New Releases</a></li>
+                        <li><a href="pages/shop.php" class="hover:underline">Shop</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Collections</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">New Releases</a></li>
                     </ul>
                 </div>
                 <div class="hidden md:block"></div>
@@ -336,7 +336,7 @@
     <script src="assets/js/cart.js"></script> 
     <script>
         let currentSlide = 1;
-        const totalSlides = 4; // Update this if you add more banners
+        const totalSlides = 4; // Update slide to add more image banners
         const dots = document.querySelectorAll('.indicator-dot');
 
         function autoSlide() {

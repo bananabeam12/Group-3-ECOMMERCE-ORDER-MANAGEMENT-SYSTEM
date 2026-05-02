@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+// Only allow access if user is logged in and has admin role; otherwise, redirect to homepage
 if (empty($_SESSION['user_id']) || empty($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     header("Location: ../../index.php");
     exit();
@@ -10,6 +10,7 @@ include('../includes/header.php');
 include('../includes/sidebar.php');
 
 ?>
+<!-- Order Management Page -->
 <!DOCTYPE html>
 <html lang="en" data-theme="cupcake">
 
@@ -17,29 +18,34 @@ include('../includes/sidebar.php');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Management - SKRRT WORLDWIDE</title>
-    
-     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" /> 
-     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> 
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body class="bg-base-200 min-h-screen relative">
-  
+
     <div class="flex flex-col md:flex-row w-full min-h-screen">
-       
+
         <main class="flex-1 p-4 sm:p-6 md:p-8 w-full max-w-7xl mx-auto overflow-x-hidden">
             <header class="mb-8">
                 <h1 class="text-center text-xl sm:text-2xl font-bold uppercase tracking-widest">ORDER LOGISTICS</h1>
-                <h1 class="text-center text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">Track and manage global shipments</h1>
+                <h1 class="text-center text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">Track and manage
+                    global shipments</h1>
             </header>
 
             <section class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8 w-full h-auto">
-                <div class="stat-card p-6 h-32 flex flex-col justify-center bg-base-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                    <p class="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-widest">Total Revenue</p>
+                <div
+                    class="stat-card p-6 h-32 flex flex-col justify-center bg-base-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <p class="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-widest">Total Revenue
+                    </p>
                     <b id="total-revenue" class="text-xl sm:text-2xl font-black text-black">₱0.00</b>
                 </div>
 
-                <div class="stat-card p-6 h-32 flex flex-col justify-center bg-base-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                    <p class="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-widest">Active Shipments</p>
+                <div
+                    class="stat-card p-6 h-32 flex flex-col justify-center bg-base-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <p class="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-widest">Active Shipments
+                    </p>
                     <b id="total-orders" class="text-xl sm:text-2xl font-black text-blue-600">0</b>
                 </div>
             </section>
@@ -73,23 +79,22 @@ include('../includes/sidebar.php');
             </section>
         </main>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             loadAnalytics();
             loadAdminOrders();
         });
-
+        // Load analytics data
         function loadAnalytics() {
             fetch('../../api.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: "adminFetchSalesSummary"
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: "adminFetchSalesSummary"
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status) {
@@ -100,34 +105,34 @@ include('../includes/sidebar.php');
         }
 
         async function loadAdminOrders() {
-    const adminOrderTable = document.getElementById('adminOrderTable');
-    const statusOptions = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded'];
+            const adminOrderTable = document.getElementById('adminOrderTable');
+            const statusOptions = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded'];
+            // Fetch all orders from the server
+            try {
+                const response = await fetch('../../api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "fetchAllOrders" })
+                });
 
-    try {
-        const response = await fetch('../../api.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "fetchAllOrders" })
-        });
+                if (!response.ok) throw new Error("Network response was not ok");
 
-        if (!response.ok) throw new Error("Network response was not ok");
+                let data = await response.json();
 
-        let data = await response.json();
+                if (data.status) {
+                    adminOrderTable.innerHTML = "";
+                    let orders = data.orders;
+                    let rows = "";
 
-        if (data.status) {
-            adminOrderTable.innerHTML = "";
-            let orders = data.orders;
-            let rows = "";
-
-            for (let i = 0; i < orders.length; i++) {
-                // Generate the <select> options dynamically
-                let optionsHTML = statusOptions.map(status => `
+                    for (let i = 0; i < orders.length; i++) {
+                        // Generate the <select> options dynamically
+                        let optionsHTML = statusOptions.map(status => `
                     <option value="${status}" ${orders[i].status === status ? 'selected' : ''}>
                         ${status.toUpperCase()}
                     </option>
                 `).join('');
 
-                rows += `
+                        rows += `
                     <tr class="hover:bg-base-200 transition-colors">
                         <td class="font-bold align-middle">#${orders[i].order_id}</td>
                         <td class="align-middle">${orders[i].user_id}</td>
@@ -147,40 +152,40 @@ include('../includes/sidebar.php');
                         </td>
                     </tr>
                 `;
+                    }
+                    adminOrderTable.innerHTML = rows;
+                }
+
+            } catch (error) {
+                console.error("Failed to load orders:", error);
+                adminOrderTable.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-error font-bold uppercase tracking-widest">Unable to load orders.</td></tr>`;
             }
-            adminOrderTable.innerHTML = rows;
         }
 
-    } catch (error) {
-        console.error("Failed to load orders:", error);
-        adminOrderTable.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-error font-bold uppercase tracking-widest">Unable to load orders.</td></tr>`;
-    }
-}
-
-
+        // Update order status when admin changes the dropdown selection
         function updateOrderStatus(orderId, newStatus) {
             if (!confirm(`Update order #${orderId} to ${newStatus.toUpperCase()}?`)) {
-                loadAdminOrders(); 
+                loadAdminOrders();
                 return;
             }
 
             fetch('../../api.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: "adminUpdateOrderStatus",
-                        orderId: orderId,
-                        status: newStatus
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: "adminUpdateOrderStatus",
+                    orderId: orderId,
+                    status: newStatus
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status) {
                         alert("SKRRT! Status updated.");
-                        loadAdminOrders(); 
-                        loadAnalytics(); 
+                        loadAdminOrders();
+                        loadAnalytics();
                     } else {
                         alert("Update Failed: " + data.message);
                     }

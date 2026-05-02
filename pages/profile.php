@@ -26,14 +26,14 @@ if (!isset($_SESSION['user_id'])) {
             </a>
             <div class="hidden md:flex items-center">
                 <ul class="flex font-semibold space-x-10 text-[14px] tracking-wide uppercase">
-                    <li><a href="shop.php" class="hover:opacity-60">Shop</a></li>
-                    <li><a href="collections.php" class="hover:opacity-60">Collections</a></li>
-                    <li><a href="about.php" class="hover:opacity-60">About</a></li>
-                    <li><a href="contact.php" class="hover:opacity-60">Contact Us</a></li>
+                    <li><a href="../pages/shop.php" class="hover:opacity-60">Shop</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Collections</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">About</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Contact Us</a></li>
                 </ul>
             </div>
             <div class="flex items-center space-x-6 text-sm">
-                <a href="cart.php" class="relative hover:opacity-60 transition-opacity">
+                <a href="../pages/cart.php" class="relative hover:opacity-60 transition-opacity">
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span id="cart-indicator" class="bg-[#A6F000] text-black font-semibold px-1 min-w-[10px] text-xs">0</span>
                 </a>
@@ -214,6 +214,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <script src="../assets/js/cart.js"></script>
     <script>
+        
         const API = '../api.php';
 
         function formatPrice(amount) {
@@ -238,7 +239,7 @@ if (!isset($_SESSION['user_id'])) {
 
         // ── Load profile + address ────────────────────────────────────────────
         let currentAddressId = null;
-
+        // Fetch user profile and address data from the API and populate the form fields
         async function loadProfile() {
             const res  = await fetch(API, {
                 method: 'POST',
@@ -247,8 +248,9 @@ if (!isset($_SESSION['user_id'])) {
             });
             const data = await res.json();
 
+            // If not logged in or error, redirect to login page
             if (!data.status) {
-                window.location.href = 'pages/login.php';
+                window.location.href = '../index.php';
                 return;
             }
 
@@ -286,6 +288,7 @@ if (!isset($_SESSION['user_id'])) {
 
         // ── Load orders ───────────────────────────────────────────────────────
         async function loadOrders() {
+            // Fetch user orders from the API and populate the orders list
             const res  = await fetch(API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

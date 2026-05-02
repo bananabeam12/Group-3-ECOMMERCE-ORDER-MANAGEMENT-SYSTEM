@@ -1,4 +1,5 @@
 <?php
+// api.php - Main API endpoint for handling all AJAX requests from the frontend.
 ob_start();
 error_reporting(0);
 ini_set('display_errors', 0);

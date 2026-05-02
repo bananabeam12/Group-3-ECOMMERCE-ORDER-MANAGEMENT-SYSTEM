@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// ── ?clear=1 wipes stale session (use this if you get stuck redirecting) ──
+// ── ?clear=1 used for debugging only ──
 if (isset($_GET['clear'])) {
     $_SESSION = [];
     if (ini_get("session.use_cookies")) {
@@ -17,8 +17,7 @@ if (isset($_GET['clear'])) {
 }
 
 /**
- * SKRRT WORLDWIDE - ENTRY VAULT
- * Only redirect if a real login session exists (set by api.php loginAccount).
+ * redirect if a real login session exists.
  */
 if (
     !empty($_SESSION['user_id']) &&
@@ -63,7 +62,7 @@ if (
             margin-right: 6px;
         }
 
-        /* subtle dot grid on green panel */
+        /* grid */
         .grid-bg {
             background-image:
                 linear-gradient(rgba(0,0,0,.06) 1px, transparent 1px),
@@ -100,7 +99,6 @@ if (
             <!-- ─── LOGIN ─── -->
             <div id="loginSection" class="anim-fade-up">
 
-                <!-- Mobile-only logo strip -->
                 <div class="flex items-center gap-3 mb-8 lg:hidden">
                     <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="w-8 h-auto">
                     <span class="font-black text-base uppercase tracking-widest">Skrrt Worldwide</span>
@@ -149,7 +147,6 @@ if (
             <!-- ─── REGISTER ─── -->
             <div id="registerSection" class="anim-fade-up" style="display:none;">
 
-                <!-- Mobile-only logo strip -->
                 <div class="flex items-center gap-3 mb-8 lg:hidden">
                     <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="w-8 h-auto">
                     <span class="font-black text-base uppercase tracking-widest">Skrrt Worldwide</span>
@@ -286,6 +283,7 @@ function toggleForm(show) {
     document.getElementById('registerSection').style.display = show === 'register' ? 'block' : 'none';
 }
 
+// toggles password; show/hide
 function togglePassword(inputId, btn) {
     const input  = document.getElementById(inputId);
     const isPass = input.type === 'password';
@@ -295,6 +293,7 @@ function togglePassword(inputId, btn) {
         : '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>';
 }
 
+// toast notification
 function showToast(message, type = 'success') {
     const wrap = document.getElementById('toastWrap');
     const div  = document.createElement('div');
@@ -310,6 +309,7 @@ function setLoading(btnId, loading, defaultText) {
     btn.innerHTML = loading ? `<span class="spinner"></span>Loading…` : defaultText;
 }
 
+// handlesLogin; fetches api with action 'loginAccount' and user credentials, then processes response.
 async function handleLogin() {
     const email    = document.getElementById('logInEmail').value.trim();
     const password = document.getElementById('logInPassword').value;
@@ -337,7 +337,7 @@ async function handleLogin() {
         setLoading('logInBtn', false, 'Sign In');
     }
 }
-
+// handlesRegister; validates input fields, then fetches api with action 'registerAccount' and user details, then processes response.
 async function handleRegister() {
     const firstName       = document.getElementById('registerFirstName').value.trim();
     const lastName        = document.getElementById('registerLastName').value.trim();

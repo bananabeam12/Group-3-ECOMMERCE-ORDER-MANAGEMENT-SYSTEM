@@ -1,0 +1,3 @@
+# Exclude Tailwind executable and environment
+tailwind-env/
+tailwind.exe

@@ -25,9 +25,9 @@
                 <ul id="nav-menu"
                     class="flex flex-col p-4 md:p-0 mt-4 font-semibold md:space-x-10 md:flex-row md:mt-0 text-[14px] tracking-wide uppercase transition-colors duration-500">
                     <li><a href="../pages/shop.php" class="hover:opacity-60">Shop</a></li>
-                    <li><a href="../pages/collections.php" class="hover:opacity-60">Collections</a></li>
-                    <li><a href="../pages/about.php" class="hover:opacity-60">About</a></li>
-                    <li><a href="../pages/contact.php" class="hover:opacity-60">Contact Us</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Collections</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">About</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Contact Us</a></li>
                 </ul>
             </div>
 
@@ -78,7 +78,7 @@
                 <div></div>
             </div>
 
-            <!-- Cart Items injected here -->
+            <!-- Cart Items injected by renderCart function -->
             <div id="cartItems"></div>
 
             <!-- Subtotal -->
@@ -111,20 +111,20 @@
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Information</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="#" class="hover:underline">Privacy</a></li>
-                        <li><a href="#" class="hover:underline">FAQ</a></li>
-                        <li><a href="#" class="hover:underline">Shipping and payment</a></li>
-                        <li><a href="#" class="hover:underline">Partners</a></li>
-                        <li><a href="#" class="hover:underline">Blog</a></li>
-                        <li><a href="#" class="hover:underline">Contacts</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Privacy</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">FAQ</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Shipping and payment</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Partners</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Blog</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Contacts</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Menu</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="shop.php" class="hover:underline">Shop</a></li>
-                        <li><a href="collections.php" class="hover:underline">Collections</a></li>
-                        <li><a href="new_releases.php" class="hover:underline">New Releases</a></li>
+                        <li><a href="pages/shop.php" class="hover:underline">Shop</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">Collections</a></li>
+                        <li><a href="pages/404.php" class="hover:underline">New Releases</a></li>
                     </ul>
                 </div>
                 <div class="hidden md:block"></div>
@@ -163,7 +163,7 @@
 
     <script>
         // ─── Helpers ──────────────────────────────────────────────────────────────
-
+        
         const API = '../api.php';
 
         function formatPrice(amount) {
@@ -174,7 +174,6 @@
         }
 
         // ─── localStorage cart (guest) ────────────────────────────────────────────
-
         function getLocalCart() {
             return JSON.parse(localStorage.getItem('skrrt_cart') || '[]');
         }
@@ -184,7 +183,6 @@
         }
 
         // ─── Check if user is logged in via API ───────────────────────────────────
-
         async function isLoggedIn() {
             try {
                 const res = await fetch(API, {
@@ -200,7 +198,6 @@
         }
 
         // ─── Build a single cart row ──────────────────────────────────────────────
-
         function buildRow(item, isLoggedIn) {
             const image = item.image_url
                 ? '../' + item.image_url

@@ -1,15 +1,15 @@
 <?php
 session_start();
 // Security: Kick out if not logged in OR if they are a customer
-if (empty($_SESSION['user_id']) || empty($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     header("Location: ../../index.php");
     exit();
 }
-
 include('../includes/header.php');
 include('../includes/sidebar.php');
 
 ?>
+<!-- Admin Dashboard -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +30,7 @@ include('../includes/sidebar.php');
     <main class="main-content p-4 sm:p-6 md:p-8 w-full overflow-x-hidden">
     
         <header class="mb-8">
-          <h1 id="welcome-message" class="text-center text-xl sm:text-2xl font-bold">WELCOME, ADMIN</h1>
+          <h1 id="welcome-message" class="text-center text-xl sm:text-2xl font-bold">Welcome, ; ?></h1>
           <h1 class="text-center text-sm sm:text-md font-bold text-gray-500 uppercase tracking-widest mt-1">System Overview</h1>
         </header>
    
@@ -183,7 +183,7 @@ include('../includes/sidebar.php');
             }, 300);
         });
     }
-    
+    // Search users based on input with debounce to reduce API calls
     async function searchUser(searchTerm){
         try {
             const request = await fetch('../../api.php', {
@@ -205,7 +205,7 @@ include('../includes/sidebar.php');
             tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-red-500 font-medium">Failed to load registry.</td></tr>`;
         }
     }
-
+    // Render user data into the table, showing a message if no users are found
     function renderUsers(users) {
         let rows = "";
         if (!users || users.length === 0) {
@@ -232,7 +232,7 @@ include('../includes/sidebar.php');
         }
         tableBody.innerHTML = rows;
     }
-
+    // Logout function that calls the API to destroy the session and then redirects to logout.php
     function logout() {
         fetch('../../api.php', {
             method: 'POST',
@@ -249,7 +249,7 @@ include('../includes/sidebar.php');
             window.location.href = 'logout.php';
         });
     }
-
+    // Fetches sales analytics data and renders it into Chart.js charts for visual representation of key metrics
     async function loadAnalyticsCharts() {
         try {
             const response = await fetch('../../api.php', {

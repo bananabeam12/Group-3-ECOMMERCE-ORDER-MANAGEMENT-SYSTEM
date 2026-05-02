@@ -1,6 +1,6 @@
 <?php
 session_start();
-// If already logged in, redirect appropriately
+// Redirect logged-in users away from the forgot password page
 if (!empty($_SESSION['user_id']) && !empty($_SESSION['user_role'])) {
     header($_SESSION['user_role'] === 'admin'
         ? 'Location: ../admin/pages/dashboard.php'
@@ -147,7 +147,7 @@ if (!empty($_SESSION['user_id']) && !empty($_SESSION['user_role'])) {
                 </button>
             </div>
 
-            <!-- ── STEP 3: Success ── -->
+            
             <div id="step3" class="step">
                 <div class="mb-6">
                     <div class="w-14 h-14 bg-[#A6F000] rounded-full flex items-center justify-center mb-6">
@@ -277,7 +277,6 @@ if (!empty($_SESSION['user_id']) && !empty($_SESSION['user_role'])) {
         }
     }
 
-    // Allow Enter key on step 1
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             const active = document.querySelector('.step.active');

@@ -23,10 +23,10 @@
             <div class="items-center justify-between hidden w-full md:flex md:w-auto">
                 <ul id="nav-menu"
                     class="flex flex-col p-4 md:p-0 mt-4 font-semibold md:space-x-10 md:flex-row md:mt-0 text-[14px] tracking-wide uppercase transition-colors duration-500">
-                    <li><a href="shop.php" class="hover:opacity-60">Shop</a></li>
-                    <li><a href="collections.php" class="hover:opacity-60">Collections</a></li>
-                    <li><a href="about.php" class="hover:opacity-60">About</a></li>
-                    <li><a href="contact.php" class="hover:opacity-60">Contact Us</a></li>
+                    <li><a href="../pages/shop.php" class="hover:opacity-60">Shop</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Collections</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">About</a></li>
+                    <li><a href="../pages/404.php" class="hover:opacity-60">Contact Us</a></li>
                 </ul>
             </div>
 
@@ -37,7 +37,7 @@
                         <span id="cart-indicator" class="bg-white text-black font-semibold px-1 min-w-[10px]">0</span>
                     </div>
                 </a>
-                 <a href="profile.php" class="relative hover:opacity-60 transition-opacity">
+                 <a href="../pages/profile.php" class="relative hover:opacity-60 transition-opacity">
                     <i class="fa-regular fa-user"></i>
                 </a>
             </div>
@@ -105,20 +105,20 @@
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Information</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="#" class="hover:underline">Privacy</a></li>
-                        <li><a href="#" class="hover:underline">FAQ</a></li>
-                        <li><a href="#" class="hover:underline">Shipping and payment</a></li>
-                        <li><a href="#" class="hover:underline">Partners</a></li>
-                        <li><a href="#" class="hover:underline">Blog</a></li>
-                        <li><a href="#" class="hover:underline">Contacts</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Privacy</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">FAQ</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Shipping and payment</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Partners</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Blog</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Contacts</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Menu</h4>
                     <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="shop.php" class="hover:underline">Shop</a></li>
-                        <li><a href="collections.php" class="hover:underline">Collections</a></li>
-                        <li><a href="new_releases.php" class="hover:underline">New Releases</a></li>
+                        <li><a href="../pages/shop.php" class="hover:underline">Shop</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">Collections</a></li>
+                        <li><a href="../pages/404.php" class="hover:underline">New Releases</a></li>
                     </ul>
                 </div>
                 <div class="hidden md:block"></div>
@@ -231,6 +231,7 @@
         // ── Initial load: fetch all products from API ─────────────────────────
         async function loadProducts() {
             try {
+                // Fetch all products from the API and store in allProducts
                 const res  = await fetch('../api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

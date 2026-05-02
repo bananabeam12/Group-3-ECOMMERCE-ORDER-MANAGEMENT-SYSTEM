@@ -1,4 +1,5 @@
 <?php
+// Checkout page - users must be logged in to access
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php?redirect=checkout");
@@ -222,6 +223,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <script src="../assets/js/cart.js"></script>
     <script>
+        // API endpoint for AJAX calls
         const API = '../api.php';
 
         function formatPrice(amount) {
@@ -230,7 +232,7 @@ if (!isset($_SESSION['user_id'])) {
                 maximumFractionDigits: 2
             });
         }
-
+        // Builds the HTML for a single item in the order summary sidebar
         function buildSummaryItem(item) {
             const image = item.image_url
                 ? '../../' + item.image_url
@@ -258,7 +260,7 @@ if (!isset($_SESSION['user_id'])) {
 
         let cartItems = [];
         let cartTotal = 0;
-
+        // Loads the cart summary and pre-fills contact/delivery info if available
         async function loadSummary() {
             try {
                 const cartRes = await fetch(API, {
@@ -283,7 +285,7 @@ if (!isset($_SESSION['user_id'])) {
                     document.getElementById('phone').value     = u.phone_number || '';
                 }
 
-                // Prefill delivery fields from the user's saved address (most recent first)
+                // Prefill delivery fields
                 if (profileData.status && profileData.addresses && profileData.addresses.length > 0) {
                     const a = profileData.addresses[0];
                     document.getElementById('address').value  = a.address_description || '';
@@ -291,7 +293,7 @@ if (!isset($_SESSION['user_id'])) {
                     document.getElementById('province').value = a.province            || '';
                     document.getElementById('zip').value      = a.zip_code            || '';
 
-                    // Set country dropdown if it matches one of the options
+                    
                     const countrySelect = document.getElementById('country');
                     const countryVal = a.country || '';
                     const matchingOption = Array.from(countrySelect.options)
@@ -307,7 +309,7 @@ if (!isset($_SESSION['user_id'])) {
                 renderSummary();
             }
         }
-
+        // Renders the order summary sidebar based on the current cart items and total
         function renderSummary() {
             document.getElementById('summaryLoading').classList.add('hidden');
 
@@ -325,7 +327,7 @@ if (!isset($_SESSION['user_id'])) {
             document.getElementById('summarySubtotal').textContent = formatPrice(cartTotal);
             document.getElementById('summaryTotal').textContent = formatPrice(cartTotal);
         }
-
+        // Validates the checkout form fields and highlights any missing required fields
         function validate() {
             const required = ['email', 'firstName', 'lastName', 'address', 'city', 'province', 'zip'];
             let valid = true;
@@ -382,7 +384,7 @@ if (!isset($_SESSION['user_id'])) {
                 btn.textContent = 'Place Order';
             }
         });
-
+        // Displays the success message and order ID after a successful order placement
         function showSuccess(orderId) {
             document.getElementById('checkoutForm').classList.add('hidden');
             document.getElementById('successState').classList.remove('hidden');

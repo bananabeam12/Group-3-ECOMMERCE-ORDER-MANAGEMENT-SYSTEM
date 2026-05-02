@@ -1,3 +1,4 @@
+<!-- View Image Modal -->
 <dialog id="viewImageModal" class="modal">
     <div class="modal-box w-11/12 max-w-4xl p-0 overflow-hidden relative bg-base-300 rounded-xl">
         
