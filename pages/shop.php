@@ -31,10 +31,6 @@
             </div>
 
             <div id="nav-icons" class="flex items-center space-x-6 text-sm transition-colors duration-500">
-                <button type="button" class="hover:opacity-60 transition-opacity">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-
                 <a href="../pages/cart.php" class="relative hover:opacity-60 transition-opacity">
                     <div class="indicator">
                         <i class="fa-solid fa-cart-shopping"></i>
