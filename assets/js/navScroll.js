@@ -13,7 +13,7 @@ window.onscroll = function () {
         icons.classList.add("text-black");
 
         indicator.classList.remove("bg-white");
-        indicator.classList.add("bg-[#A6F000]");
+        indicator.classList.add("bg-brand-green");
     } else {
         // TOP: Transparent background, White text
         navbar.classList.add("py-6", "text-white");
@@ -23,6 +23,6 @@ window.onscroll = function () {
         icons.classList.add("text-white");
 
         indicator.classList.add("bg-white");
-        indicator.classList.remove("bg-[#A6F000]");
+        indicator.classList.remove("bg-brand-green");
     }
 };

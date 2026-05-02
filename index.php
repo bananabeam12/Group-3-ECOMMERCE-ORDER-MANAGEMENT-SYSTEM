@@ -1,367 +1,386 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// ── ?clear=1 wipes stale session (use this if you get stuck redirecting) ──
+if (isset($_GET['clear'])) {
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $p["path"], $p["domain"], $p["secure"], $p["httponly"]);
+    }
+    session_destroy();
+    header("Location: index.php");
+    exit();
+}
+
+/**
+ * SKRRT WORLDWIDE - ENTRY VAULT
+ * Only redirect if a real login session exists (set by api.php loginAccount).
+ */
+if (
+    !empty($_SESSION['user_id']) &&
+    !empty($_SESSION['user_role']) &&
+    in_array($_SESSION['user_role'], ['admin', 'customer'])
+) {
+    if ($_SESSION['user_role'] === 'admin') {
+        header("Location: admin/pages/inventory.php");
+    } else {
+        header("Location: customer.php");
+    }
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skrrt | Streetwear</title>
+    <title>SKRRT WORLDWIDE — SIGN IN</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
-</head>
+    <style>
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+        @keyframes slideIn { from { opacity:0; transform:translateX(14px); } to { opacity:1; transform:none; } }
+        @keyframes spin    { to   { transform: rotate(360deg); } }
 
-<body>
-    <!-- NAVIGATION -->
-    <nav id="navbar" class="fixed w-full z-50 top-0 start-0 transition-all duration-500 ease-in-out py-6 text-white">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-10">
-            <a href="#" class="flex items-center">
-                <span id="nav-logo" class="transition-all duration-500">
-                    <img id="logo-img" src="assets/images/Skrrt_logo-Alt.png" alt="Logo"
-                        class="h-10 w-auto object-contain">
-                </span>
-            </a>
+        .anim-fade-up  { animation: fadeUp  .45s ease both; }
+        .anim-slide-in { animation: slideIn .25s ease both; }
 
-            <div class="items-center justify-between hidden w-full md:flex md:w-auto">
-                <ul id="nav-menu"
-                    class="flex flex-col p-4 md:p-0 mt-4 font-semibold md:space-x-10 md:flex-row md:mt-0 text-[14px] tracking-wide uppercase transition-colors duration-500">
-                    <li><a href="pages/shop.php" class="hover:opacity-60">Shop</a></li>
-                    <li><a href="pages/collections.php" class="hover:opacity-60">Collections</a></li>
-                    <li><a href="pages/about.php" class="hover:opacity-60">About</a></li>
-                    <li><a href="pages/contact.php" class="hover:opacity-60">Contact Us</a></li>
-                </ul>
-            </div>
+        .register-scroll::-webkit-scrollbar       { width: 3px; }
+        .register-scroll::-webkit-scrollbar-thumb { background: black; border-radius: 2px; }
 
-            <div id="nav-icons" class="flex items-center space-x-6 text-sm transition-colors duration-500">
-                <button type="button" class="hover:opacity-60 transition-opacity">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-
-                <a href="pages/cart.php" class="relative hover:opacity-60 transition-opacity">
-                    <div class="indicator">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span id="cart-indicator" class="indicator-item badge badge-sm bg-white text-black font-semibold">0</span>
-                    </div>                
-                </a>
-
-                <button type="button" class="hover:opacity-60 transition-opacity">
-                    <i class="fa-regular fa-user"></i>
-                </button>
-            </div>
-    </nav>
-
-    <!-- HERO CAROUSEL -->
-    <div id="hero-carousel" class="carousel w-full h-screen overflow-x-hidden flex flex-row">
-        <div id="slide1" class="carousel-item relative w-full h-full flex-shrink-0">
-            <img src="assets/images/hero_carousel_1.jpg" class="w-full h-full object-cover" alt="Skrrt 1">
-            <div class="absolute inset-0 bg-black/20"></div>
-        </div>
-
-        <div id="slide2" class="carousel-item relative w-full h-full flex-shrink-0">
-            <img src="assets/images/hero_carousel_2.jpg" class="w-full h-full object-cover" alt="Skrrt 2">
-            <div class="absolute inset-0 bg-black/20"></div>
-        </div>
-
-        <div id="slide3" class="carousel-item relative w-full h-full flex-shrink-0">
-            <img src="assets/images/hero_carousel_3.jpg" class="w-full h-full object-cover" alt="Skrrt 3">
-            <div class="absolute inset-0 bg-black/20"></div>
-        </div>
-
-        <div id="slide4" class="carousel-item relative w-full h-full flex-shrink-0">
-            <img src="assets/images/hero_carousel_4.jpg" class="w-full h-full object-cover" alt="Skrrt 4">
-            <div class="absolute inset-0 bg-black/20"></div>
-        </div>
-    </div>
-
-    <!-- MARQUEE SCROLL DIVIDER ANIMATION -->
-    <div class="absolute z-30 flex -translate-x-1/2 bottom-10 left-1/2 space-x-3">
-        <div class="indicator-dot w-2 h-2 rounded-full bg-white opacity-100 transition-all duration-500"></div>
-        <div class="indicator-dot w-2 h-2 rounded-full bg-white opacity-40 transition-all duration-500"></div>
-        <div class="indicator-dot w-2 h-2 rounded-full bg-white opacity-40 transition-all duration-500"></div>
-        <div class="indicator-dot w-2 h-2 rounded-full bg-white opacity-40 transition-all duration-500"></div>
-    </div>
-
-    <section class="bg-white py-20 px-4 md:px-10">
-        <div class="max-w-screen-xl mx-auto text-center">
-            <h2 class="text-3xl font-semibold text-black uppercase tracking-wide mb-12">New Releases</h2>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-x-12 md:gap-y-16">
-                <?php
-                // simple placeholder array to mimic a database result.
-                // remove later after integrating the database.
-                $products = [
-                    ['id' => 1, 'name' => 'New T-Shirt 1', 'price' => 1500, 'image' => 'assets/images/placeholder_tee.png'],
-                    ['id' => 2, 'name' => 'New T-Shirt 2', 'price' => 1500, 'image' => 'assets/images/placeholder_tee.png'],
-                    ['id' => 3, 'name' => 'New T-Shirt 3', 'price' => 1500, 'image' => 'assets/images/placeholder_tee.png'],
-                    ['id' => 4, 'name' => 'New T-Shirt 4', 'price' => 1500, 'image' => 'assets/images/placeholder_tee.png'],
-                    ['id' => 5, 'name' => 'New T-Shirt 5', 'price' => 1500, 'image' => 'assets/images/placeholder_tee.png'],
-                    ['id' => 6, 'name' => 'New T-Shirt 6', 'price' => 1500, 'image' => 'assets/images/placeholder_tee.png'],
-                    ['id' => 7, 'name' => 'New T-Shirt 7', 'price' => 1500, 'image' => 'assets/images/placeholder_tee.png'],
-                ];
-
-                foreach ($products as $product) {
-                    ?>
-                    <a href="product.php?name=<?php echo $product['name']; ?>"
-                        class="block product-card group text-center cursor-pointer">
-
-                        <div class="relative aspect-square w-full mb-6 overflow-hidden">
-                            <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>"
-                                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 ease-in-out">
-                        </div>
-
-                        <p class="text-lg font-semibold text-black uppercase tracking-normal mb-2">
-                            <?php echo $product['name']; ?>
-                        </p>
-                        <p class="text-base font-semibold text-black opacity-80">
-                            ₱<?php echo number_format($product['price'], 2); ?>
-                        </p>
-
-                    </a>
-                    <?php
-                } // End of loop
-                ?>
-            </div>
-
-            <div class="mt-20">
-                <a href="shop.php"
-                    class="inline-block bg-[#2C2C2C] text-white px-12 py-4 rounded-none text-xs capitalize tracking-widest font-bold hover:scale-105 transition-all">
-                    Browse Shop
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- MARQUEE SCROLL DIVIDER ANIMATION -->
-    <section class="relative w-full h-[250px] bg-white overflow-hidden py-10">
-        <div
-            class="absolute top-1/2 left-[-10%] w-[120%] bg-[#A6F000] py-4  rotate-[-5deg] shadow-lg z-10 overflow-hidden flex items-center">
-            <div class="flex flex-nowrap items-center whitespace-nowrap animate-marquee w-max">
-                <div class="flex items-center flex-shrink-0">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">FOR THE DREAMERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">THE DOERS AND THE
-                        DRIFTERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">GEAR FOR THE GRIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">SKRRRRRRT</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">ALWAYS ON THE MOVE</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">KEEP UP OR GET LEFT
-                        BEHIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                </div>
-
-                <div class="flex items-center flex-shrink-0">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">FOR THE DREAMERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">THE DOERS AND THE
-                        DRIFTERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">GEAR FOR THE GRIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">SKRRRRRRT</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">ALWAYS ON THE MOVE</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">KEEP UP OR GET LEFT
-                        BEHIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                </div>
-            </div>
-
-        </div>
-        <div
-            class="absolute top-1/2 left-[-10%] w-[120%] bg-[#A6F000] py-4 rotate-[4deg] shadow-lg z-10 overflow-hidden">
-            <div class="flex flex-nowrap items-center whitespace-nowrap animate-marquee-reverse w-max">
-                <div class="flex items-center flex-shrink-0">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">FOR THE DREAMERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">THE DOERS AND THE
-                        DRIFTERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">GEAR FOR THE GRIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">SKRRRRRRT</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">ALWAYS ON THE MOVE</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">KEEP UP OR GET LEFT
-                        BEHIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                </div>
-
-                <div class="flex items-center">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">FOR THE DREAMERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">THE DOERS AND THE
-                        DRIFTERS</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">GEAR FOR THE GRIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">SKRRRRRRT</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">ALWAYS ON THE MOVE</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                    <span class="text-black font-bold uppercase text-sm tracking-wider px-4">KEEP UP OR GET LEFT
-                        BEHIND</span>
-                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="h-6 w-auto inline-block mx-2">
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="bg-white py-12 px-4 md:px-10 mt-20">
-        <div class="max-w-screen-xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-[350px]">
-
-                <a href="shop.php?collection=better-days" class="group relative block overflow-hidden bg-gray-100">
-                    <img src="assets/images/hero_carousel_3.jpg" alt="two man in a photo"
-                        class="w-full h-full object-cover">
-
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
-                        <h3 class="text-white text-2xl font-bold uppercase tracking-widest">All Collections</h3>
-                    </div>
-
-                    <div
-                        class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span
-                            class="text-white text-xl font-semibold capitalize tracking-widest border-b-2 border-white pb-1">
-                            Browse Collection
-                        </span>
-                    </div>
-                </a>
-
-                <a href="shop.php?collection=josh" class="group relative block overflow-hidden bg-gray-100">
-                    <img src="assets/images/collection_thumbnail_2.jpg" alt="sunglasses"
-                        class="w-full h-full object-cover">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
-                        <h3 class="text-white text-2xl font-bold uppercase tracking-widest">Accessories</h3>
-                    </div>
-                    <div
-                        class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span
-                            class="text-white text-xl font-semibold capitalize tracking-widest border-b-2 border-white pb-1">
-                            Browse Collection
-                        </span>
-                    </div>
-                </a>
-
-                <a href="shop.php?collection=ordinary"
-                    class="group relative block overflow-hidden bg-gray-100 md:col-span-2 h-[400px]">
-                    <img src="assets/images/collection_thumbnail_3.jpg" alt="Ordinary Vol 1"
-                        class="w-full h-full object-cover">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent flex items-end p-10">
-                        <h3 class="text-white text-3xl font-bold uppercase tracking-widest">T-Shirts</h3>
-                    </div>
-                    <div
-                        class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span
-                            class="text-white text-xl font-semibold capitalize tracking-widest border-b-2 border-white pb-1">
-                            Browse Collection
-                        </span>
-                    </div>
-                </a>
-
-            </div>
-        </div>
-    </section>
-    
-    <!-- FOOTER -->
-    <footer class="bg-[#A6F000] pt-20 pb-0 px-4 md:px-20 text-black relative overflow-hidden mt-10">
-        <div class="max-w-screen-xl mx-auto relative z-30">
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-10">
-                <div>
-                    <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Information</h4>
-                    <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="#" class="hover:underline">Privacy</a></li>
-                        <li><a href="#" class="hover:underline">FAQ</a></li>
-                        <li><a href="#" class="hover:underline">Shipping and payment</a></li>
-                        <li><a href="#" class="hover:underline">Partners</a></li>
-                        <li><a href="#" class="hover:underline">Blog</a></li>
-                        <li><a href="#" class="hover:underline">Contacts</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-[10px] uppercase tracking-[0.2em] font-bold mb-6 opacity-50">Menu</h4>
-                    <ul class="space-y-3 text-[13px] font-medium">
-                        <li><a href="shop.php" class="hover:underline">Shop</a></li>
-                        <li><a href="collections.php" class="hover:underline">Collections</a></li>
-                        <li><a href="new_releases.php" class="hover:underline">New Releases</a></li>
-                    </ul>
-                </div>
-                <div class="hidden md:block"></div>
-                <div class="flex flex-col items-start md:items-end">
-                    <div
-                        class="bg-black text-[#A6F000] px-8 py-3 rounded-full text-[12px] font-bold uppercase mb-4 cursor-pointer hover:scale-105 transition-transform">
-                        Request a call
-                    </div>
-                    <p class="text-[14px] font-bold">+1 (888) 999-99-99</p>
-                    <p class="text-[14px] font-medium opacity-70">info@skrrtworldwide.com</p>
-                </div>
-            </div>
-
-            <div
-                class="flex flex-col md:flex-row justify-between items-center border-t border-black/10 pt-10 mb-10 md:mb-15">
-                <div class="flex space-x-4">
-                    <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white">
-                        <i class="fa-brands fa-telegram"></i>
-                    </div>
-                    <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white">
-                        <i class="fa-brands fa-instagram"></i>
-                    </div>
-                </div>
-                <div class="text-[11px] font-bold uppercase tracking-widest text-center mt-4 md:mt-0">
-                    2ITB Information Management. PNC, Philippines 81063
-                </div>
-                <div class="text-[11px] opacity-60 mt-4 md:mt-0">
-                    &copy; 2026 Skrrt Worldwide. All Rights Reserved.
-                </div>
-            </div>
-        </div>
-        <div
-            class="relative left-1/2 -translate-x-1/2 w-[115%] md:w-[130%] mt-5 pointer-events-none z-10 origin-bottom">
-            <img src="assets/images/Skrrt_logo-Half.svg" alt="Logo"
-                class="w-full h-auto object-contain object-bottom select-none">
-        </div>
-    </footer>
-    <script src="assets/js/navScroll.js"></script>
-    <script>
-        let currentSlide = 1;
-        const totalSlides = 4; // Update this if you add more banners
-        const dots = document.querySelectorAll('.indicator-dot');
-
-        function autoSlide() {
-            const container = document.getElementById('hero-carousel');
-            const target = document.getElementById(`slide${currentSlide}`);
-
-            // Calculate the exact position based on width
-            const scrollAmount = container.clientWidth * (currentSlide - 1);
-
-            container.scrollTo({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-
-            // Update dots
-            dots.forEach((dot, index) => {
-                dot.style.opacity = (index + 1 === currentSlide) ? "1" : "0.4";
-            });
-
-            // Increment or reset
-            if (currentSlide >= totalSlides) {
-                currentSlide = 1;
-            } else {
-                currentSlide++;
-            }
+        .spinner {
+            display: inline-block;
+            width: 13px; height: 13px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
         }
 
-        // Set the interval (5000ms = 5 seconds)
-        setInterval(autoSlide, 5000);
+        /* subtle dot grid on green panel */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(0,0,0,.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,.06) 1px, transparent 1px);
+            background-size: 36px 36px;
+        }
+    </style>
+</head>
+<body class="bg-white text-black h-screen overflow-hidden">
 
-    </script>
+<div class="flex h-screen">
+
+    <!-- ══ LEFT — BRAND PANEL ══ -->
+    <div class="hidden lg:flex w-1/2 bg-[#A6F000] grid-bg flex-col justify-between p-14 relative overflow-hidden">
+        <p class="text-[10px] font-bold uppercase tracking-[.22em] text-black/50 relative z-10">Streetwear Apparel</p>
+
+        <div class="relative z-10 anim-fade-up">
+            <img src="assets/images/Skrrt_logo-Full.png" alt="Skrrt" class="w-100 h-auto mb-5 opacity-100">
+            <h1 class="font-black text-[5.5rem] leading-[.88] tracking-tight uppercase text-black select-none">
+                WORLD<br>WIDE
+            </h1>
+        </div>
+
+        <div class="relative z-10">
+            <p class="text-[11px] font-medium text-black/40 tracking-wide">© 2026 Skrrt Worldwide</p>
+            <p class="text-[11px] font-medium text-black/40 mt-1">Always on the move.</p>
+        </div>
+    </div>
+
+    <!-- ══ RIGHT — FORM PANEL ══ -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center px-8 md:px-16 py-10 overflow-y-auto bg-white">
+        <div class="w-full max-w-sm">
+
+            <!-- ─── LOGIN ─── -->
+            <div id="loginSection" class="anim-fade-up">
+
+                <!-- Mobile-only logo strip -->
+                <div class="flex items-center gap-3 mb-8 lg:hidden">
+                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="w-8 h-auto">
+                    <span class="font-black text-base uppercase tracking-widest">Skrrt Worldwide</span>
+                </div>
+
+                <h2 class="font-black text-5xl uppercase tracking-tight leading-none mb-1">Sign In.</h2>
+                <p class="text-xs text-gray-400 font-medium mb-8">
+                    No account?
+                    <span class="text-black font-bold underline underline-offset-2 cursor-pointer hover:opacity-60 transition-opacity"
+                          onclick="toggleForm('register')">Create one</span>
+                </p>
+
+                <!-- Email -->
+                <div class="mb-4">
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Email</label>
+                    <input type="email" id="logInEmail" placeholder="you@skrrt.com"
+                           class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium placeholder-black/25 focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                </div>
+
+                <!-- Password -->
+                <div class="mb-2">
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Password</label>
+                    <div class="flex">
+                        <input type="password" id="logInPassword" placeholder="••••••••"
+                               class="flex-1 px-4 py-3 border border-black/15 border-r-0 bg-gray-50 text-sm font-medium placeholder-black/25 focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                        <button type="button" onclick="togglePassword('logInPassword', this)"
+                                class="px-3.5 border border-black/15 bg-gray-100 text-gray-400 hover:text-black hover:bg-gray-200 transition-colors flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 pointer-events-none">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <a href="pages/forgot_password.php"
+                       class="block text-right mt-1.5 text-[11px] text-gray-300 hover:text-black transition-colors font-medium">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button type="button" id="logInBtn" onclick="handleLogin()"
+                        class="w-full mt-5 py-4 bg-black text-white text-[11px] font-black uppercase tracking-[.18em] hover:opacity-80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                    Sign In
+                </button>
+            </div>
+
+            <!-- ─── REGISTER ─── -->
+            <div id="registerSection" class="anim-fade-up" style="display:none;">
+
+                <!-- Mobile-only logo strip -->
+                <div class="flex items-center gap-3 mb-8 lg:hidden">
+                    <img src="assets/images/Skrrt_logo-Alt.png" alt="Skrrt" class="w-8 h-auto">
+                    <span class="font-black text-base uppercase tracking-widest">Skrrt Worldwide</span>
+                </div>
+
+                <h2 class="font-black text-5xl uppercase tracking-tight leading-none mb-1">Join Up.</h2>
+                <p class="text-xs text-gray-400 font-medium mb-6">
+                    Already a member?
+                    <span class="text-black font-bold underline underline-offset-2 cursor-pointer hover:opacity-60 transition-opacity"
+                          onclick="toggleForm('login')">Sign in</span>
+                </p>
+
+                <div class="register-scroll max-h-[62vh] overflow-y-auto pr-1 space-y-4">
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">First Name</label>
+                            <input type="text" id="registerFirstName"
+                                   class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Last Name</label>
+                            <input type="text" id="registerLastName"
+                                   class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Email Address</label>
+                        <input type="email" id="registerEmail"
+                               class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Phone Number</label>
+                        <input type="text" id="registerPhone" placeholder="09XXXXXXXXX"
+                               class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium placeholder-black/25 focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="flex items-center gap-3 py-1">
+                        <div class="flex-1 h-px bg-black/10"></div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-300">Shipping Address</span>
+                        <div class="flex-1 h-px bg-black/10"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Street / House No.</label>
+                        <textarea id="registerAddress" rows="2"
+                                  class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">City</label>
+                            <input type="text" id="registerCity"
+                                   class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Province</label>
+                            <input type="text" id="registerProvince"
+                                   class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">ZIP Code</label>
+                            <input type="text" id="registerZip"
+                                   class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Country</label>
+                            <input type="text" id="registerCountry" value="Philippines"
+                                   class="w-full px-4 py-3 border border-black/15 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="flex items-center gap-3 py-1">
+                        <div class="flex-1 h-px bg-black/10"></div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-300">Security</span>
+                        <div class="flex-1 h-px bg-black/10"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Password</label>
+                        <div class="flex">
+                            <input type="password" id="registerPassword"
+                                   class="flex-1 px-4 py-3 border border-black/15 border-r-0 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                            <button type="button" onclick="togglePassword('registerPassword', this)"
+                                    class="px-3.5 border border-black/15 bg-gray-100 text-gray-400 hover:text-black hover:bg-gray-200 transition-colors flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 pointer-events-none">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Confirm Password</label>
+                        <div class="flex">
+                            <input type="password" id="registerConfirmPassword"
+                                   class="flex-1 px-4 py-3 border border-black/15 border-r-0 bg-gray-50 text-sm font-medium focus:outline-none focus:border-black focus:bg-white transition-colors rounded-none">
+                            <button type="button" onclick="togglePassword('registerConfirmPassword', this)"
+                                    class="px-3.5 border border-black/15 bg-gray-100 text-gray-400 hover:text-black hover:bg-gray-200 transition-colors flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 pointer-events-none">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="registerBtn" onclick="handleRegister()"
+                            class="w-full py-4 bg-black text-white text-[11px] font-black uppercase tracking-[.18em] hover:bg-[#A6F000] hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed mb-6">
+                        Complete Registration
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toastWrap" class="fixed top-6 right-6 z-50 flex flex-col gap-2"></div>
+
+<script>
+function toggleForm(show) {
+    document.getElementById('loginSection').style.display    = show === 'login'    ? 'block' : 'none';
+    document.getElementById('registerSection').style.display = show === 'register' ? 'block' : 'none';
+}
+
+function togglePassword(inputId, btn) {
+    const input  = document.getElementById(inputId);
+    const isPass = input.type === 'password';
+    input.type   = isPass ? 'text' : 'password';
+    btn.querySelector('svg').innerHTML = isPass
+        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>';
+}
+
+function showToast(message, type = 'success') {
+    const wrap = document.getElementById('toastWrap');
+    const div  = document.createElement('div');
+    div.className = `anim-slide-in bg-black text-white text-xs font-semibold px-4 py-3 min-w-[220px] border-l-4 ${type === 'success' ? 'border-[#A6F000]' : 'border-red-500'}`;
+    div.textContent = message;
+    wrap.appendChild(div);
+    setTimeout(() => div.remove(), 3500);
+}
+
+function setLoading(btnId, loading, defaultText) {
+    const btn  = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading ? `<span class="spinner"></span>Loading…` : defaultText;
+}
+
+async function handleLogin() {
+    const email    = document.getElementById('logInEmail').value.trim();
+    const password = document.getElementById('logInPassword').value;
+    if (!email || !password) { showToast('Please fill in all fields.', 'error'); return; }
+
+    setLoading('logInBtn', true, 'Sign In');
+    try {
+        const res  = await fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'loginAccount', email, password })
+        });
+        const data = await res.json();
+        if (data.status) {
+            showToast(`Welcome back, ${data.user.firstName}! 🔥`);
+            setTimeout(() => {
+                window.location.href = data.role === 'admin' ? 'admin/pages/dashboard.php' : 'customer.php';
+            }, 800);
+        } else {
+            showToast(data.message || 'Login failed.', 'error');
+            setLoading('logInBtn', false, 'Sign In');
+        }
+    } catch (err) {
+        showToast('Server error. Please try again.', 'error');
+        setLoading('logInBtn', false, 'Sign In');
+    }
+}
+
+async function handleRegister() {
+    const firstName       = document.getElementById('registerFirstName').value.trim();
+    const lastName        = document.getElementById('registerLastName').value.trim();
+    const email           = document.getElementById('registerEmail').value.trim();
+    const phone           = document.getElementById('registerPhone').value.trim();
+    const address         = document.getElementById('registerAddress').value.trim();
+    const city            = document.getElementById('registerCity').value.trim();
+    const province        = document.getElementById('registerProvince').value.trim();
+    const zip             = document.getElementById('registerZip').value.trim();
+    const country         = document.getElementById('registerCountry').value.trim();
+    const password        = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+    if (!firstName || !lastName || !email || !phone || !address || !city || !province || !zip || !password) {
+        showToast('Please fill in all required fields.', 'error'); return;
+    }
+    if (password !== confirmPassword) { showToast('Passwords do not match.', 'error'); return; }
+    if (password.length < 6) { showToast('Password must be at least 6 characters.', 'error'); return; }
+
+    setLoading('registerBtn', true, 'Complete Registration');
+    try {
+        const res  = await fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'registerAccount', firstName, lastName, email, phone, address, city, province, zip, country, password })
+        });
+        const data = await res.json();
+        if (data.status) {
+            showToast('Account created! Please sign in. 🎉');
+            setTimeout(() => toggleForm('login'), 1200);
+        } else {
+            showToast(data.message || 'Registration failed.', 'error');
+        }
+    } catch (err) {
+        showToast('Server error. Please try again.', 'error');
+    } finally {
+        setLoading('registerBtn', false, 'Complete Registration');
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.getElementById('loginSection').style.display !== 'none') handleLogin();
+});
+</script>
 </body>
-
 </html>

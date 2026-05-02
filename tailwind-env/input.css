@@ -37,7 +37,7 @@
 
 /* Tell Tailwind to scan your project files for classes */
 @source "../index.php";
-@source "../**/*.php";
+@source "../pages/**/*.php";
 
 
 @font-face {
@@ -54,6 +54,11 @@
 @layer base {
   html {
     font-family: "Inter", sans-serif;
+  }
+
+    h1, h2, h3, h4, h5, h6 {
+    font-size: revert;
+    font-weight: revert;
   }
 }
 
